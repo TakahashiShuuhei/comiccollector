@@ -31,7 +31,7 @@ class MonitoredPage:
 
     def check(self, link_repository) -> Set[Link]:
         found_links = self.collect()
-        saved_links = link_repository.get_all(self.id)
+        saved_links = [link.url for link in link_repository.get_all(self.id)]
         new_links = set(found_links) - set(saved_links)
         if new_links:
             new_links = {Link(self.id, l, self.type) for l in new_links}
