@@ -11,9 +11,8 @@ class SqliteComicRepository(ComicRepository):
          title text,
          url text)
     """
-    def __init__(self, path):
-        self.path = path
-        self.connection = sqlite3.connect(path)
+    def __init__(self, connection):
+        self.connection = connection
 
     def save(self, comic: Comic) -> Comic:
         cursor = self.connection.cursor()
@@ -32,7 +31,6 @@ class SqliteComicRepository(ComicRepository):
                 values
                    (?, ?)''', (comic.title, comic.url))
             comic.id = cursor.lastrowid
-        self.connection.commit()
         return comic
 
     def get_all(self) -> List[Comic]:

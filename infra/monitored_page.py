@@ -14,9 +14,8 @@ class SqliteMonitoredPageRepository:
          foreign key(comic_id) references comics(id))
     """
 
-    def __init__(self, path):
-        self.path = path
-        self.connection = sqlite3.connect(path)
+    def __init__(self, connection):
+        self.connection = connection
     
     def save(self, comic_id: int, page: MonitoredPage):
         cursor = self.connection.cursor()

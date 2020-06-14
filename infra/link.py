@@ -9,12 +9,11 @@ class SqliteLinkRepository(LinkRepository):
          url text,
          page_id integer,
          created_at text,
-         foreign key(page_id) references monitored_pages(id)))
+         foreign key(page_id) references monitored_pages(id))
     """
 
-    def __init__(self, path):
-        self.path = path
-        self.connection = sqlite3.connect(path)
+    def __init__(self, connection):
+        self.connection = connection
     
     def save(self, link: Link):
         cursor = self.connection.cursor()
@@ -23,7 +22,6 @@ class SqliteLinkRepository(LinkRepository):
                 (url, page_id, created_at)
             values
                 (?, ?, ?)''', (link.url, link.page_id, link.created_at.isoformat()))
-        self.connection.commit()
         return link
 
     def get_all(self, page_id: int):
@@ -36,7 +34,7 @@ class SqliteLinkRepository(LinkRepository):
             where
                 page_id=?
             order by
-                created_at desc''', (page_id))
+                created_at desc''', (page_id,))
         result = []
         for row in cursor.fetchall():
             link = Link(page_id, row[1], datetime.fromisoformat(row[3]))

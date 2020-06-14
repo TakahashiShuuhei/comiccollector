@@ -1,15 +1,25 @@
-from domain.monitored_page import MonitoredPage
 from datetime import datetime
+
+class CollectionType:
+    IMAGE = { 'name': 'IMAGE', 'tag': 'img', 'attr': 'src'}
+    LINK = { 'name': 'LINK', 'tag': 'a', 'attr': 'href'}
+
+    @classmethod
+    def name_to_type(cls, name):
+        m = {
+            t.get('name'): t for t in [cls.IMAGE, cls.LINK]
+        }
+        return m.get(name)
 
 class Link:
     """
 
     """
-    def __init__(self, page_id: int, url: str, type: MonitoredPage, created_at=None: datetime):
+    def __init__(self, page_id: int, url: str, type: CollectionType, created_at: datetime =None):
         self.page_id = page_id
         self.url = url
         self.type = type
-        self.created_at = created_at if created_at or datatime.now()
+        self.created_at = created_at if created_at else datetime.now()
 
 
 class LinkRepository:
