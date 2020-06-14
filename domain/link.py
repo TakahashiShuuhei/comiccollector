@@ -15,7 +15,8 @@ class Link:
     """
 
     """
-    def __init__(self, page_id: int, url: str, type: CollectionType, created_at: datetime =None):
+    def __init__(self, id: int, page_id: int, url: str, type: CollectionType, created_at: datetime =None):
+        self.id = id
         self.page_id = page_id
         self.url = url
         self.type = type

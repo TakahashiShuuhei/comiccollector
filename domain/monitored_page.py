@@ -2,7 +2,7 @@ from bs4 import BeautifulSoup
 import requests
 from retrying import retry
 from domain.link import Link, CollectionType
-from typing import Set
+from typing import List
 import re
 from urllib.parse import urlparse
 
@@ -30,12 +30,13 @@ class MonitoredPage:
         attr = self.type['attr']
         return [self._convert_link(target.attrs.get(attr)) for target in targets if p.match(target.attrs.get(attr))]
 
-    def check(self, link_repository) -> Set[Link]:
+    def check(self, link_repository) -> List[Link]:
         found_links = self.collect()
         saved_links = [self._convert_link(link.url) for link in link_repository.get_all(self.id)]
-        new_links = set(found_links) - set(saved_links)
+        new_links = list(set(found_links) - set(saved_links))
         if new_links:
-            new_links = {Link(self.id, l, self.type) for l in new_links}
+            new_links = [Link(None, self.id, l, self.type) for l in new_links]
+            new_links.sort(key=lambda l: l.url)
             for link in new_links:
                 link_repository.save(link)
         return new_links

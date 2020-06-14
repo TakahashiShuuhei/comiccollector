@@ -1,4 +1,4 @@
-from domain.link import Link, LinkRepository
+from domain.link import Link, LinkRepository, CollectionType
 import sqlite3
 from datetime import datetime
 
@@ -23,6 +23,7 @@ class SqliteLinkRepository(LinkRepository):
                 (url, page_id, created_at)
             values
                 (?, ?, ?)''', (link.url, link.page_id, link.created_at.isoformat()))
+        link.id = cursor.lastrowid
         return link
 
     def get_all(self, page_id: int):
@@ -38,6 +39,6 @@ class SqliteLinkRepository(LinkRepository):
                 created_at desc''', (page_id,))
         result = []
         for row in cursor.fetchall():
-            link = Link(page_id, row[1], datetime.fromisoformat(row[3]))
+            link = Link(row[0], page_id, row[1], datetime.fromisoformat(row[3]))
             result.append(link)
         return result

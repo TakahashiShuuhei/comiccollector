@@ -1,6 +1,6 @@
 from typing import List
 from domain.monitored_page import MonitoredPage
-from domain.link import LinkRepository
+from domain.link import LinkRepository, Link
 from dataclasses import dataclass
 
 
@@ -15,7 +15,7 @@ class Comic:
         self.pages = pages
 
     def check(self, link_repository: LinkRepository):
-        new_links = []
+        new_links: List[Link] = []
         for page in self.pages:
             new_links.extend(page.check(link_repository))
         return new_links
