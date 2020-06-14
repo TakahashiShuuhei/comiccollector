@@ -1,5 +1,8 @@
 from typing import List
 from domain.monitored_page import MonitoredPage
+from domain.link import LinkRepository
+from dataclasses import dataclass
+
 
 class Comic:
     """
@@ -11,16 +14,22 @@ class Comic:
         self.url = url
         self.pages = pages
 
-    def check(self):
-        raise NotImplementedError
+    def check(self, link_repository: LinkRepository):
+        new_links = []
+        for page in self.pages:
+            new_links.extend(page.check(link_repository))
+        return new_links
 
     def add_page(self, page):
         self.pages.append(page)
 
 
 class ComicRepository:
-    def save(comic: Comic):
+    def save(self, comic: Comic):
         raise NotImplementedError
 
-    def get(id: int) -> Comic:
+    def get(self, id: int) -> Comic:
+        raise NotImplementedError
+
+    def get_all(self) -> List[Comic]:
         raise NotImplementedError

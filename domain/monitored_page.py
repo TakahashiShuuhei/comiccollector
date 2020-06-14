@@ -3,14 +3,22 @@ import requests
 from retrying import retry
 
 class CollectionType:
-    IMAGE = { 'tag': 'img', 'attr': 'src'}
-    LINK = { 'tag': 'a', 'attr': 'href'}
+    IMAGE = { 'name': 'IMAGE', 'tag': 'img', 'attr': 'src'}
+    LINK = { 'name': 'LINK', 'tag': 'a', 'attr': 'href'}
+
+    @classmethod
+    def name_to_type(cls, name):
+        m = {
+            t.get('name'): t for t in [cls.IMAGE, cls.LINK]
+        }
+        return m.get(name)
 
 class MonitoredPage:
     """
     監視対象ページ
     """
-    def __init__(self, url: str, pattern: str, type: CollectionType):
+    def __init__(self, id: int, url: str, pattern: str, type: CollectionType):
+        self.id = id    
         self.url = url
         self.pattern = pattern
         self.type = type
@@ -28,3 +36,11 @@ class MonitoredPage:
         p = re.compile(pattern)
         attr = self.type['attr']
         return [target.attrs.get(attr) for target in targets if p.match(target.attrs.get(attr))]
+
+    def check(self, link_repository):
+        found_links = self.collect()
+        saved_links = link_repository.get_all(self.id)
+        new_links = set(found_links) - set(saved_links)
+        if new_links:
+            link_repository.save_links(self.id, new_links)
+        return new_links
