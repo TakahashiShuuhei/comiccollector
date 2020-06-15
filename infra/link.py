@@ -10,7 +10,7 @@ class SqliteLinkRepository(LinkRepository):
          url text,
          page_id integer,
          created_at text,
-         foreign key(page_id) references monitored_pages(id))
+         foreign key(page_id) references pages(id))
     """
 
     def __init__(self, connection):

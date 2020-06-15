@@ -1,5 +1,5 @@
 from domain.comic import Comic, ComicRepository
-from domain.monitored_page import MonitoredPage, CollectionType
+from domain.page import Page, CollectionType
 import sqlite3
 from typing import List
 
@@ -56,15 +56,15 @@ class SqliteComicRepository(ComicRepository):
                 pattern,
                 type
             from
-                monitored_pages
+                pages
             where
                 comic_id in ({",".join(["?"]*len(comic_ids))})
         ''', list(comic_ids))
         def _to_page(row):
-            return MonitoredPage(row[0], 
-                                 row[1], 
-                                 row[3], 
-                                 CollectionType.name_to_type(row[4]))
+            return Page(row[0], 
+                        row[1], 
+                        row[3], 
+                        CollectionType.name_to_type(row[4]))
         for row in cursor.fetchall():
             comic_id = row[2]
             page = _to_page(row)

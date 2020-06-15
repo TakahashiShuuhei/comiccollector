@@ -1,5 +1,5 @@
 from typing import List
-from domain.monitored_page import MonitoredPage
+from domain.page import Page
 from domain.link import LinkRepository, Link
 from dataclasses import dataclass
 
@@ -8,7 +8,7 @@ class Comic:
     """
     漫画
     """
-    def __init__(self, id: int, title: str, url: str, pages: List[MonitoredPage]):
+    def __init__(self, id: int, title: str, url: str, pages: List[Page]):
         self.id = id    
         self.title = title
         self.url = url

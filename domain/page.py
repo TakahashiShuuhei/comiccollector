@@ -6,7 +6,7 @@ from typing import List
 import re
 from urllib.parse import urlparse
 
-class MonitoredPage:
+class Page:
     """
     監視対象ページ
     """

@@ -1,11 +1,11 @@
-from domain.monitored_page import MonitoredPage
+from domain.page import Page
 import sqlite3
 
-class SqliteMonitoredPageRepository:
+class SqlitePageRepository:
     """
     todo comic.py に置くべき
     create table
-        monitored_pages
+        pages
         (id integer primary key autoincrement,
          url text,
          comic_id integer,
@@ -17,19 +17,19 @@ class SqliteMonitoredPageRepository:
     def __init__(self, connection):
         self.connection = connection
     
-    def save(self, comic_id: int, page: MonitoredPage):
+    def save(self, comic_id: int, page: Page):
         cursor = self.connection.cursor()
         if page.id:
             cursor.execute('''
                 update
-                    monitored_pages
+                    pages
                 set
                     url=?, pattern=?, type=?
                 where
                     id=?''', (page.url, page.pattern, page.type.get('name'), page.id))
         else:
             cursor.execute('''
-                insert into monitored_pages
+                insert into pages
                     (url, comic_id, pattern, type)
                 values
                     (?, ?, ?, ?)''', (page.url, comic_id, page.pattern, page.type.get('name')))
