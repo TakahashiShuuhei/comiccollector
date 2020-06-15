@@ -21,26 +21,9 @@ def update_check():
         if new_links:
             result.append((comic, new_links))
     if result:
-        save_images(result)
         notify(result)
     connection.commit()
 
-
-def save_images(result):
-    # TODO 多分ここに書くべきじゃない
-    for comic, links in result:
-        dir_path = os.path.join(IMG_DIR, comic.title)
-        if not os.path.exists(dir_path):
-            os.mkdir(dir_path)
-        for link in links:
-            if link.type != CollectionType.IMAGE:
-                continue
-            ext = link.url.split('.')[-1]
-            file_path = f'{comic.title}/{link.page_id}__{link.id}.{ext}'
-            file_path = os.path.join(IMG_DIR, file_path)
-            response = requests.get(link.url)
-            with open(file_path, 'wb') as f:
-                f.write(response.content)
 
 def notify(result):
     import os

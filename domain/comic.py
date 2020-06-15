@@ -17,7 +17,7 @@ class Comic:
     def check(self, link_repository: LinkRepository):
         new_links: List[Link] = []
         for page in self.pages:
-            new_links.extend(page.check(link_repository))
+            new_links.extend(page.check(link_repository, self.title))
         return new_links
 
     def add_page(self, page):

@@ -4,7 +4,12 @@ from retrying import retry
 from domain.link import Link, CollectionType
 from typing import List
 import re
+import os
 from urllib.parse import urlparse
+
+
+IMG_DIR = './imgs'
+
 
 class Page:
     """
@@ -30,17 +35,20 @@ class Page:
         attr = self.type['attr']
         return [self._convert_link(target.attrs.get(attr)) for target in targets if p.match(target.attrs.get(attr))]
 
-    def check(self, link_repository) -> List[Link]:
+    def check(self, link_repository, comic_title) -> List[Link]:
         found_links = self.collect()
         saved_links = [self._convert_link(link.url) for link in link_repository.get_all(self.id)]
         new_links = list(set(found_links) - set(saved_links))
+        file_dir = os.path.join(IMG_DIR, comic_title)
         if new_links:
             new_links = [Link(None, self.id, l, self.type) for l in new_links]
             new_links.sort(key=lambda l: l.url)
             for link in new_links:
                 link_repository.save(link)
+                link.save_file(file_dir)
+
         return new_links
-    
+
     def _convert_link(self, link):
         if link.startswith('http'):
             return link
