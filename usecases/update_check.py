@@ -1,19 +1,13 @@
-import sqlite3
 import os
-from infra.comic import SqliteComicRepository
-from infra.link import SqliteLinkRepository
+from logging import getLogger
 from domain.link import CollectionType
 import requests
 
+logger = getLogger(__name__)
 
-DB_PATH = './hoge.db'
-
-
-def update_check():
-    connection = sqlite3.connect(DB_PATH)
-    comic_repository = SqliteComicRepository(connection)
-    link_repository = SqliteLinkRepository(connection)
-
+def update_check(connection, comic_repository, link_repository):
+    # TODO connectionに依存しちゃってる
+    logger.info('更新の確認を開始します')
     result = []
     comics = comic_repository.get_all()
     for comic in comics:
@@ -23,6 +17,7 @@ def update_check():
     if result:
         notify(result)
     connection.commit()
+    logger.info('更新の確認が完了しました')
 
 
 def notify(result):
@@ -44,9 +39,5 @@ def _to_mail_body(result):
         has_more = len(links) > 5
         for link in links[:5]:
             body += f'    {link.url}\n'
-        body += f'他{len(links)-5}件\n\n' if has_more else '\n'
+        body += f'    他{len(links)-5}件\n\n' if has_more else '\n'
     return body
-
-
-if __name__ == '__main__':
-    update_check()

@@ -2,7 +2,9 @@ from typing import List
 from domain.page import Page
 from domain.link import LinkRepository, Link
 from dataclasses import dataclass
+from logging import getLogger
 
+logger = getLogger(__name__)
 
 class Comic:
     """
@@ -15,9 +17,14 @@ class Comic:
         self.pages = pages
 
     def check(self, link_repository: LinkRepository):
+        logger.info(f'[{self.title}]の更新を確認します')
         new_links: List[Link] = []
         for page in self.pages:
             new_links.extend(page.check(link_repository, self.title))
+        if new_links:
+            logger.info(f'[{self.title}]で新しいリンクが{len(new_links)}見つかりました')
+        else:
+            logger.info(f'[{self.title}]で新しいリンクが見つかりませんでした')
         return new_links
 
     def add_page(self, page):

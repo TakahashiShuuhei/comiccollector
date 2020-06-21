@@ -124,6 +124,7 @@ class ImagePage(Page):
             for link in new_links:
                 link_repository.save(link)
                 link.save_file(file_dir)
+                time.sleep(0.5)
         return new_links
 
 
