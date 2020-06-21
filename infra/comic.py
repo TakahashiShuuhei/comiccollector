@@ -1,7 +1,13 @@
 from domain.comic import Comic, ComicRepository
-from domain.page import Page, CollectionType
+from domain.page import Page, CollectionType, PageType, ImagePage, LinkPage
+import json
 import sqlite3
 from typing import List
+
+_page_types = {
+    PageType.IMAGE.name: ImagePage,
+    PageType.LINK.name: LinkPage
+}
 
 class SqliteComicRepository(ComicRepository):
     """
@@ -9,7 +15,16 @@ class SqliteComicRepository(ComicRepository):
         comics
         (id integer primary key autoincrement,
          title text,
-         url text)
+         url text);
+    
+    create table
+        pages
+        (id integer primary key autoincrement,
+         url text,
+         comic_id int,
+         type text,
+         attributes json,
+         foreign key(comic_id) references comics(id));
     """
     def __init__(self, connection):
         self.connection = connection
@@ -53,21 +68,23 @@ class SqliteComicRepository(ComicRepository):
                 id,
                 url,
                 comic_id,
-                pattern,
-                type
+                type,
+                attributes
             from
                 pages
             where
                 comic_id in ({",".join(["?"]*len(comic_ids))})
         ''', list(comic_ids))
+
         def _to_page(row):
-            return Page(row[0], 
-                        row[1], 
-                        row[3], 
-                        CollectionType.name_to_type(row[4]))
+            page_type = row[3]
+            clazz = _page_types.get(page_type)
+            attributes = json.loads(row[4], strict=False)
+            return clazz(row[0], row[1], **attributes)
+
         for row in cursor.fetchall():
             comic_id = row[2]
             page = _to_page(row)
             comic = comics.get(comic_id)
-            comic.pages.append(page)
+            comic.add_page(page)
         return list(comics.values())

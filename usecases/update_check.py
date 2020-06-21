@@ -7,7 +7,7 @@ import requests
 
 
 DB_PATH = './hoge.db'
-IMG_DIR = './imgs'
+
 
 def update_check():
     connection = sqlite3.connect(DB_PATH)
@@ -35,7 +35,7 @@ def notify(result):
                    subject='更新があったよ',
                    plain_text_content=body)
     sg = SendGridAPIClient(os.environ.get('SENDGRID_API_KEY'))
-    response = sg.send(message)
+    sg.send(message)
 
 def _to_mail_body(result):
     body = ''
