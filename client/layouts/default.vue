@@ -1,9 +1,23 @@
 <template>
-  <div>
-    <nuxt />
-  </div>
+  <el-container>
+    <el-aside width="150px">
+      <side-menu />
+    </el-aside>
+    <el-container>
+      <nuxt />
+    </el-container>
+  </el-container>
 </template>
 
+<script>
+import SideMenu from '@/components/SideMenu.vue'
+
+export default {
+  components: {
+    SideMenu
+  }
+}
+</script>
 <style>
 html {
   font-family:
@@ -58,5 +72,13 @@ html {
 .button--grey:hover {
   color: #fff;
   background-color: #35495e;
+}
+
+.el-aside {
+  border-right: solid 1px #e6e6e6;
+}
+
+.el-menu {
+  border-right-style: none;
 }
 </style>
