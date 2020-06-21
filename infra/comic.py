@@ -1,12 +1,13 @@
 from domain.comic import Comic, ComicRepository
-from domain.page import Page, CollectionType, PageType, ImagePage, LinkPage
+from domain.page import Page, CollectionType, PageType, ImagePage, LinkPage, ParentPage
 import json
 import sqlite3
 from typing import List
 
 _page_types = {
     PageType.IMAGE.name: ImagePage,
-    PageType.LINK.name: LinkPage
+    PageType.LINK.name: LinkPage,
+    PageType.PARENT.name: ParentPage
 }
 
 class SqliteComicRepository(ComicRepository):

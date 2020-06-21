@@ -41,9 +41,10 @@ def _to_mail_body(result):
     body = ''
     for comic, links in result:
         body += f'{comic.title}: {comic.url}\n\n'
-        for link in links:
+        has_more = len(links) > 5
+        for link in links[:5]:
             body += f'    {link.url}\n'
-        body += '\n'
+        body += f'他{len(links)-5}件\n\n' if has_more else '\n'
     return body
 
 

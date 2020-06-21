@@ -5,6 +5,7 @@ from domain.link import Link, CollectionType
 from enum import Enum, auto
 from typing import List
 import re
+import time
 import os
 from urllib.parse import urlparse
 
@@ -25,12 +26,6 @@ class Page:
         self.id = id    
         self.url = url
         self.type = type
-    
-    def collect(self):
-        """
-        urlで指定されたページ内のリンクから、監視対象のリンク先一覧を返す
-        """
-        raise NotImplementedError
 
     def check(self, link_repository, comic_title) -> List[Link]:
         """
@@ -72,19 +67,21 @@ class LinkPage(Page):
         return [self._convert_link(target.attrs.get(attr)) for target in targets if p.match(target.attrs.get(attr))]
 
     def check(self, link_repository, comic_title) -> List[Link]:
-        collection_type = CollectionType.LINK
-
         found_links = self.collect()
         saved_links = [self._convert_link(link.url) for link in link_repository.get_all(self.id)]
         new_links = list(set(found_links) - set(saved_links))
-        file_dir = os.path.join(IMG_DIR, comic_title)
+        new_links = self.save_links(new_links, link_repository, comic_title)
+        
+        return new_links
+    
+    def save_links(self, new_links, link_repository, comic_title, collection_type=CollectionType.LINK):
         if new_links:
+            file_dir = os.path.join(IMG_DIR, comic_title)
             new_links = [Link(None, self.id, l, collection_type) for l in new_links]
             new_links.sort(key=lambda l: l.url)
             for link in new_links:
                 link_repository.save(link)
                 link.save_file(file_dir)
-        
         return new_links
 
 class ImagePage(Page):
@@ -112,17 +109,49 @@ class ImagePage(Page):
         return [self._convert_link(target.attrs.get(attr)) for target in targets if p.match(target.attrs.get(attr))]
 
     def check(self, link_repository, comic_title) -> List[Link]:
-        collection_type = CollectionType.IMAGE
-
         found_links = self.collect()
         saved_links = [self._convert_link(link.url) for link in link_repository.get_all(self.id)]
         new_links = list(set(found_links) - set(saved_links))
-        file_dir = os.path.join(IMG_DIR, comic_title)
+        new_links = self.save_links(new_links, link_repository, comic_title)
+        
+        return new_links
+    
+    def save_links(self, new_links, link_repository, comic_title, collection_type=CollectionType.IMAGE):
         if new_links:
+            file_dir = os.path.join(IMG_DIR, comic_title)
             new_links = [Link(None, self.id, l, collection_type) for l in new_links]
             new_links.sort(key=lambda l: l.url)
             for link in new_links:
                 link_repository.save(link)
                 link.save_file(file_dir)
-        
         return new_links
+
+
+class ParentPage(Page):
+    """
+    子ページ内の画像一覧を監視する
+    """
+    def __init__(self, id:int, url:str, page_pattern:str, img_pattern:str):
+        super(ParentPage, self).__init__(id, url, PageType.PARENT)
+        self.page_pattern = page_pattern
+        self.img_pattern = img_pattern
+    
+    def check(self, link_repository, comic_title) -> List[Link]:
+        saved_links = [self._convert_link(link.url) for link in link_repository.get_all(self.id)]
+
+        link_page = LinkPage(self.id, self.url, self.page_pattern)
+        children = link_page.collect()
+        new_children = list(set(children) - set(saved_links))
+
+        grand_children = []
+        for child in children:
+            time.sleep(0.5)
+            img_page = ImagePage(self.id, child, self.img_pattern)
+            grand_children.extend(img_page.collect())
+        
+        new_grand_children = list(set(grand_children) - set(saved_links))
+        if new_children:
+            new_children = link_page.save_links(new_children, link_repository, comic_title)
+        if new_grand_children:
+            new_grand_children = img_page.save_links(new_grand_children, link_repository, comic_title)
+        return new_children + new_grand_children
