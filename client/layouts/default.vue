@@ -1,11 +1,11 @@
 <template>
-  <el-container>
+  <el-container class="container">
     <el-aside width="150px">
       <side-menu />
     </el-aside>
-    <el-container>
+    <el-main class="main">
       <nuxt />
-    </el-container>
+    </el-main>
   </el-container>
 </template>
 
@@ -80,5 +80,15 @@ html {
 
 .el-menu {
   border-right-style: none;
+}
+
+.container {
+  margin: 0 auto;
+  min-height: 100vh;
+  min-width: 100vw;
+}
+
+.main {
+  padding: 30px;
 }
 </style>
