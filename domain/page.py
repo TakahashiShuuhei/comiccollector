@@ -40,6 +40,13 @@ class Page:
         if url.endswith('/'):
             return url + link
         return url[:url.rfind('/')] + '/' + link
+    
+    def to_json(self):
+        return {
+            'id': self.id,
+            'url': self.url,
+            'type': self.type.name
+        }
 
         
 class LinkPage(Page):

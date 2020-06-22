@@ -29,6 +29,14 @@ class Comic:
 
     def add_page(self, page):
         self.pages.append(page)
+    
+    def to_json(self):
+        return {
+            'id': self.id,
+            'title': self.title,
+            'url': self.url,
+            'pages': [p.to_json() for p in self.pages]
+        }
 
 
 class ComicRepository:
